@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// === ENUM ===
+enum Role {
+  ADMIN
+}
+
+enum ItemType {
+  COURSE
+  UNIT
+  SUBUNIT
+  LESSON
+}
+
+// === MODELS ===
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  checkouts CheckoutSession[]
+  purchases Purchase[]
+  reviews   Review[]
+}
+
+model Course {
+  id          Int     @id @default(autoincrement())
+  title       String
+  slug        String  @unique
+  previewUrl  String? // 👀 Link preview
+  digitalUrl  String? // 🔐 Link penuh setelah beli
+  description String?
+  price       Float
+  imageUrl    String?
+
+  units      Unit[]
+  tags       TagOnCourse[]
+  categoryId Int?
+  category   Category?     @relation(fields: [categoryId], references: [id])
+  reviews    Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Unit {
+  id          Int     @id @default(autoincrement())
+  title       String
+  slug        String  @unique
+  previewUrl  String?
+  digitalUrl  String?
+  description String?
+  price       Float
+  imageUrl    String?
+
+  courseId Int
+  course   Course    @relation(fields: [courseId], references: [id])
+  subunits Subunit[]
+  lessons  Lesson[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subunit {
+  id          Int     @id @default(autoincrement())
+  title       String
+  slug        String  @unique
+  previewUrl  String?
+  digitalUrl  String?
+  description String?
+  price       Float
+  imageUrl    String?
+
+  unitId  Int
+  unit    Unit     @relation(fields: [unitId], references: [id])
+  lessons Lesson[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lesson {
+  id          Int     @id @default(autoincrement())
+  title       String
+  slug        String  @unique
+  previewUrl  String?
+  digitalUrl  String?
+  description String?
+  price       Float
+  imageUrl    String?
+
+  unitId    Int?
+  unit      Unit?    @relation(fields: [unitId], references: [id])
+  subunitId Int?
+  subunit   Subunit? @relation(fields: [subunitId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// === TAGGING ===
+
+model Tag {
+  id      Int           @id @default(autoincrement())
+  name    String        @unique
+  courses TagOnCourse[]
+}
+
+model TagOnCourse {
+  id       Int    @id @default(autoincrement())
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId Int
+  tag      Tag    @relation(fields: [tagId], references: [id])
+  tagId    Int
+
+  @@unique([courseId, tagId])
+}
+
+// === CATEGORY ===
+
+model Category {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  courses Course[]
+}
+
+// === REVIEW ===
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  courseId  Int
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+// === PEMBELIAN ===
+
+model Purchase {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  itemType  ItemType
+  itemId    Int
+  price     Float
+  createdAt DateTime @default(now())
+}
+
+model CheckoutSession {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+  stripeSessionId String   @unique
+  itemType        ItemType
+  itemId          Int
+  amount          Float
+  status          String // pending, success, failed
+  createdAt       DateTime @default(now())
+}
