@@ -1,5 +1,5 @@
 import * as UnitRepository from './unit.repository.js';
-
+import slugify from 'slugify';
 export const getAllUnits = async () => {
     return await UnitRepository.findAll();
 };
@@ -9,7 +9,11 @@ export const getUnitById = async (id) => {
 };
 
 export const createUnit = async (data) => {
-    return await UnitRepository.create(data);
+    let slug = data.slug;
+    if (!slug && data.title) {
+        slug = slugify(data.title, { lower: true, strict: true });
+    }
+    return await UnitRepository.create({ ...data, slug });
 };
 
 export const updateUnit = async (id, data) => {

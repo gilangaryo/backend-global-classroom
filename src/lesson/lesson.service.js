@@ -1,4 +1,5 @@
 import * as LessonRepository from './lesson.repository.js';
+import slugify from 'slugify';
 
 export const getAllLessons = async () => {
     return await LessonRepository.findAll();
@@ -9,7 +10,11 @@ export const getLessonById = async (id) => {
 };
 
 export const createLesson = async (data) => {
-    return await LessonRepository.create(data);
+    let slug = data.slug;
+    if (!slug && data.title) {
+        slug = slugify(data.title, { lower: true, strict: true });
+    }
+    return await LessonRepository.create({ ...data, slug });
 };
 
 export const updateLesson = async (id, data) => {

@@ -3,18 +3,37 @@ import * as CourseService from './course.service.js';
 export const getAllCourses = async (req, res) => {
     try {
         const courses = await CourseService.getAllCourses();
-        res.json({ status: 'success', data: courses, message: 'All courses fetched' });
+        if (!courses || courses.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Courses not found'
+            });
+        }
+        res.json({
+            status: 'success',
+            data: courses,
+            message: 'All courses fetched'
+        });
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message });
     }
 };
 
-export const getCourseById = async (req, res) => {
+export const getCourseByItemId = async (req, res) => {
     try {
-        const id = req.params.id;
-        const course = await CourseService.getCourseById(id);
-        if (!course) return res.status(404).json({ status: 'error', message: 'Course not found' });
-        res.json({ status: 'success', data: course, message: 'Course found' });
+        const itemId = req.params.itemId;
+        const course = await CourseService.getCourseByItemId(itemId);
+        if (!course || course.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Courses not found'
+            });
+        }
+        res.json({
+            status: 'success',
+            data: course,
+            message: 'All courses fetched'
+        });
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message });
     }
@@ -24,9 +43,16 @@ export const createCourse = async (req, res) => {
     try {
         const data = req.body;
         const course = await CourseService.createCourse(data);
-        res.status(201).json({ status: 'success', data: course, message: 'Course created' });
+        res.status(201).json({
+            status: 'success',
+            data: course,
+            message: 'Course created'
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        res.status(500).json({
+            status: 'error', message: error.message,
+            stack: error.stack
+        });
     }
 };
 
@@ -51,3 +77,17 @@ export const deleteCourse = async (req, res) => {
     }
 };
 
+export const updateStatus = async (req, res) => {
+    try {
+        const itemId = req.params.itemId;
+        const data = req.body;
+        const course = await CourseService.updateStatus(itemId, data);
+        res.json({
+            status: 'success',
+            data: course,
+            message: 'Course status updated'
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};

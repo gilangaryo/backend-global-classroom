@@ -9,21 +9,16 @@ export const findAll = async () => {
                     lessons: true
                 }
             },
-            tags: {
-                include: {
-                    tag: true
-                }
-            },
             category: true
         }
     });
 };
 
 
-export const findById = async (id) => {
+export const findByItemId = async (itemId) => {
     return prisma.course.findUnique({
-        where: { id: Number(id) },
-        include: { units: true, tags: true, category: true },
+        where: { itemId: itemId },
+        include: { units: true, category: true },
     });
 };
 
@@ -31,15 +26,23 @@ export const create = async (data) => {
     return prisma.course.create({ data });
 };
 
-export const update = async (id, data) => {
+export const update = async (itemId, data) => {
     return prisma.course.update({
-        where: { id: Number(id) },
+        where: { itemId: itemId },
         data,
     });
 };
 
-export const remove = async (id) => {
+export const remove = async (itemId) => {
     return prisma.course.delete({
-        where: { id: Number(id) },
+        where: { itemId: itemId },
     });
 };
+
+export const updateStatus = async (itemId, status) => {
+    return prisma.course.update({
+        where: { itemId: itemId },
+        data: { isActive: status },
+    });
+};
+

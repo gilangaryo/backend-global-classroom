@@ -30,50 +30,73 @@ enum ItemType {
   LESSON
 }
 
+enum CheckoutStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+}
+
 // === MODELS ===
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  name         String?
+  role         Role     @default(ADMIN)
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   checkouts CheckoutSession[]
   purchases Purchase[]
   reviews   Review[]
+
+  @@map("user")
 }
 
 model Course {
   id          Int     @id @default(autoincrement())
+  itemId      String  @unique @default(uuid())
   title       String
   slug        String  @unique
-  previewUrl  String? // 👀 Link preview
-  digitalUrl  String? // 🔐 Link penuh setelah beli
   description String?
-  price       Float
-  imageUrl    String?
+  price       Decimal @db.Decimal(10, 2)
+
+  imageUrl String?
+
+  previewUrl String?
+  digitalUrl String
+
+  colorButton String
+  isActive    Boolean   @default(true)
+  deletedAt   DateTime?
 
   units      Unit[]
-  tags       TagOnCourse[]
   categoryId Int?
-  category   Category?     @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id])
   reviews    Review[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("course")
 }
 
 model Unit {
   id          Int     @id @default(autoincrement())
+  itemId      String  @unique @default(uuid())
   title       String
   slug        String  @unique
   previewUrl  String?
   digitalUrl  String?
   description String?
-  price       Float
-  imageUrl    String?
+  price       Decimal @db.Decimal(10, 2)
+
+  imageUrl String?
+
+  isActive Boolean @default(true)
 
   courseId Int
   course   Course    @relation(fields: [courseId], references: [id])
@@ -82,17 +105,25 @@ model Unit {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("unit")
 }
 
 model Subunit {
-  id          Int     @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
+  itemId String @unique @default(uuid())
+
   title       String
   slug        String  @unique
   previewUrl  String?
   digitalUrl  String?
   description String?
-  price       Float
-  imageUrl    String?
+  price       Decimal @db.Decimal(10, 2)
+
+  imageUrl String?
+
+  isActive Boolean @default(true)
+  tag      String
 
   unitId  Int
   unit    Unit     @relation(fields: [unitId], references: [id])
@@ -100,54 +131,46 @@ model Subunit {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("subunit")
 }
 
 model Lesson {
-  id          Int     @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
+  itemId String @unique @default(uuid())
+
   title       String
   slug        String  @unique
-  previewUrl  String?
-  digitalUrl  String?
-  description String?
-  price       Float
-  imageUrl    String?
+  description String
+  isActive    Boolean @default(true)
+
+  previewUrl String?
+  digitalUrl String?
+
+  price Decimal @db.Decimal(10, 2)
+
+  imageUrl String?
 
   unitId    Int?
   unit      Unit?    @relation(fields: [unitId], references: [id])
   subunitId Int?
   subunit   Subunit? @relation(fields: [subunitId], references: [id])
 
+  tag String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("lesson")
 }
-
-// === TAGGING ===
-
-model Tag {
-  id      Int           @id @default(autoincrement())
-  name    String        @unique
-  courses TagOnCourse[]
-}
-
-model TagOnCourse {
-  id       Int    @id @default(autoincrement())
-  course   Course @relation(fields: [courseId], references: [id])
-  courseId Int
-  tag      Tag    @relation(fields: [tagId], references: [id])
-  tagId    Int
-
-  @@unique([courseId, tagId])
-}
-
-// === CATEGORY ===
 
 model Category {
   id      Int      @id @default(autoincrement())
   name    String   @unique
   courses Course[]
-}
 
-// === REVIEW ===
+  @@map("category")
+}
 
 model Review {
   id        Int      @id @default(autoincrement())
@@ -161,28 +184,34 @@ model Review {
   course Course @relation(fields: [courseId], references: [id])
 
   @@unique([userId, courseId])
+  @@map("review")
 }
 
-// === PEMBELIAN ===
-
 model Purchase {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  itemType  ItemType
-  itemId    Int
-  price     Float
+  id     Int @id @default(autoincrement())
+  userId Int
+
+  user     User     @relation(fields: [userId], references: [id])
+  itemType ItemType
+  itemId   String
+  price    Decimal  @db.Decimal(10, 2)
+
   createdAt DateTime @default(now())
+
+  @@map("purchase")
 }
 
 model CheckoutSession {
-  id              Int      @id @default(autoincrement())
+  id              Int            @id @default(autoincrement())
   userId          Int
-  user            User     @relation(fields: [userId], references: [id])
-  stripeSessionId String   @unique
-  itemType        ItemType
-  itemId          Int
-  amount          Float
-  status          String // pending, success, failed
-  createdAt       DateTime @default(now())
+  user            User           @relation(fields: [userId], references: [id])
+  stripeSessionId String         @unique
+  status          CheckoutStatus @default(PENDING)
+
+  itemType  ItemType
+  itemId    String
+  amount    Float
+  createdAt DateTime @default(now())
+
+  @@map("checkoutsession")
 }

@@ -1,21 +1,43 @@
 import * as CourseRepository from './course.repository.js';
+import { makeSlug } from '../utils/slug.js';
+import { validateData } from '../middleware/validateData.js';
+import { CourseSchema } from '../schemas/course.schema.js';
+
 
 export const getAllCourses = async () => {
     return await CourseRepository.findAll();
 };
 
-export const getCourseById = async (id) => {
-    return await CourseRepository.findById(id);
+export const getCourseByItemId = async (itemId) => {
+    return await CourseRepository.findByItemId(itemId);
 };
 
 export const createCourse = async (data) => {
-    return await CourseRepository.create(data);
+    const validData = validateData(CourseSchema, data);
+    let slug = makeSlug(validData.title);
+
+
+    validData.slug = slug;
+
+    return CourseRepository.create({ ...validData });
 };
 
-export const updateCourse = async (id, data) => {
-    return await CourseRepository.update(id, data);
+export const updateCourse = async (itemId, data) => {
+    const validData = validateData(CourseSchema, data);
+
+    return await CourseRepository.update(itemId, validData);
 };
 
-export const deleteCourse = async (id) => {
-    return await CourseRepository.remove(id);
+export const deleteCourse = async (itemId) => {
+    return await CourseRepository.remove(itemId);
+};
+
+export const updateStatus = async (itemId, data) => {
+
+    if (typeof data.isActive !== 'boolean') {
+        throw new Error('isActive field must be a boolean');
+    }
+    const status = data.isActive
+
+    return await CourseRepository.updateStatus(itemId, status);
 };
