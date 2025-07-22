@@ -14,6 +14,7 @@ import userRoutes from './routes/user.route.js';
 import categoryRoutes from './routes/category.route.js';
 import uploadRoutes from './routes/upload.route.js';
 import stripeRoutes from './routes/stripe.route.js';
+import stripeWebhook from './stripe/webhook.js';
 
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -33,7 +34,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.use('/api/payment/webhook', stripeRoutes);
+app.use('/api/payment/webhook', stripeWebhook);
 
 app.use(cors());
 app.use(express.json());
@@ -48,7 +49,8 @@ app.use('/api/lessons', lessonRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/payment', stripeRoutes);
+app.use('/api/payment', express.json(), stripeRoutes);
+
 app.get('/', (req, res) => {
     res.send(`<div style="text-align: center;">
         <h1> Global Classroom Backend </h1>
