@@ -33,14 +33,14 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Middleware
+app.use('/api/payment/webhook', stripeRoutes);
+
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
 app.use('/uploads', express.static('uploads'));
 app.use('/api/upload', uploadRoutes);
-// Routes
 app.use('/api/courses', courseRoutes);
 app.use('/api/units', unitRoutes);
 app.use('/api/subunits', subunitRoutes);
@@ -49,37 +49,30 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/payment', stripeRoutes);
-// Root route
 app.get('/', (req, res) => {
-    res.send(`
-        <div style="text-align: center;">
-            <h1> Global Classroom Backend </h1>
-            <p> Running on port ${process.env.PORT || 4000} </p>
-        </div>
-    `);
+    res.send(`<div style="text-align: center;">
+        <h1> Global Classroom Backend </h1>
+        <p> Running on port ${process.env.PORT || 4000} </p>
+    </div>`);
 });
 app.get('/api/success', (req, res) => {
-    res.send(`
-        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
-            <div style="text-align: center;">
-                <h2 style="color: #34c759;">Success Page</h2>
-                <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">Everything is working as expected.</p>
-                <a href="/" style="background-color: #34c759; color: white; border-radius: 5px; padding: 1rem 2rem; text-decoration: none;">Go back to homepage</a>
-            </div>
+    res.send(`<div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+        <div style="text-align: center;">
+            <h2 style="color: #34c759;">Success Page</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">Everything is working as expected.</p>
+            <a href="/" style="background-color: #34c759; color: white; border-radius: 5px; padding: 1rem 2rem; text-decoration: none;">Go back to homepage</a>
         </div>
-    `);
+    </div>`);
 });
 
 app.get('/api/cancel', (req, res) => {
-    res.status(500).send(`
-        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
-            <div style="text-align: center;">
-                <h2 style="color: #ff0000;">Failed Page</h2>
-                <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">There seems to be an issue. Please try again later.</p>
-                <a href="/" style="background-color: #ff0000; color: white; border-radius: 5px; padding: 1rem 2rem; text-decoration: none;">Go back to homepage</a>
-            </div>
+    res.status(500).send(`<div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+        <div style="text-align: center;">
+            <h2 style="color: #ff0000;">Failed Page</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">There seems to be an issue. Please try again later.</p>
+            <a href="/" style="background-color: #ff0000; color: white; border-radius: 5px; padding: 1rem 2rem; text-decoration: none;">Go back to homepage</a>
         </div>
-    `);
+    </div>`);
 });
 
 app.use((req, res, next) => {
@@ -89,10 +82,8 @@ app.use((req, res, next) => {
     });
 });
 
-
 app.use(errorHandler);
 
-// Start server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
