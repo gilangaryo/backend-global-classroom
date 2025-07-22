@@ -1,90 +1,78 @@
 import * as LessonService from './lesson.service.js';
 
-export const getAllLessons = async (req, res) => {
+export const getAllLessons = async (req, res, next) => {
     try {
-        const data = await LessonService.getAllLessons();
-        return res.json({
+        const lessons = await LessonService.getAllLessons();
+        if (!lessons || lessons.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Lessons is empty'
+            });
+        }
+        res.json({
             status: 'success',
-            data,
-            message: 'All lessons fetched',
+            data: lessons,
+            message: 'All lessons fetched'
         });
     } catch (error) {
-        return res.status(500).json({
-            status: 'error',
-            message: error.message,
-        });
+        next(error);
     }
 };
 
-export const getLessonById = async (req, res) => {
+export const getLessonByItemId = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        const lesson = await LessonService.getLessonById(id);
-        if (!lesson) return res.status(404).json({
-            status: 'error',
-            message: 'Lesson not found',
-        });
-        return res.json({
-            status: 'success',
-            data: lesson,
-            message: 'Lesson found',
-        });
+        const itemId = req.params.itemId;
+        const lesson = await LessonService.getLessonByItemId(itemId);
+        if (!lesson) return res.status(404).json({ status: 'error', message: 'Lesson not found' });
+        res.json({ status: 'success', data: lesson });
     } catch (error) {
-        return res.status(500).json({
-            status: 'error',
-            message: error.message,
-        });
+        next(error);
     }
 };
 
-export const createLesson = async (req, res) => {
+export const createLesson = async (req, res, next) => {
     try {
-        const data = req.body;
-        const lesson = await LessonService.createLesson(data);
-        return res.status(201).json({
+        const lesson = await LessonService.createLesson(req.body);
+        res.status(201).json({
             status: 'success',
             data: lesson,
-            message: 'Lesson created',
+            message: 'Lesson created'
         });
     } catch (error) {
-        return res.status(500).json({
-            status: 'error',
-            message: error.message,
-        });
+        next(error);
     }
 };
 
-export const updateLesson = async (req, res) => {
+export const updateLesson = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        const data = req.body;
-        const lesson = await LessonService.updateLesson(id, data);
-        return res.json({
+        const itemId = req.params.itemId;
+        const lesson = await LessonService.updateLesson(itemId, req.body);
+        res.json({ status: 'success', data: lesson });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const deleteLesson = async (req, res, next) => {
+    try {
+        const itemId = req.params.itemId;
+        await LessonService.deleteLesson(itemId);
+        res.status(204).json({ status: 'success' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateStatus = async (req, res, next) => {
+    try {
+        const itemId = req.params.itemId;
+        const lesson = await LessonService.updateStatus(itemId, req.body);
+        res.json({
             status: 'success',
             data: lesson,
-            message: 'Lesson updated',
+            message: 'Lesson status updated'
         });
     } catch (error) {
-        return res.status(500).json({
-            status: 'error',
-            message: error.message,
-        });
+        next(error);
     }
 };
-
-export const deleteLesson = async (req, res) => {
-    try {
-        const id = req.params.id;
-        await LessonService.deleteLesson(id);
-        return res.status(204).json({
-            status: 'success',
-            message: 'Lesson deleted',
-        });
-    } catch (error) {
-        return res.status(500).json({
-            status: 'error',
-            message: error.message,
-        });
-    }
-};
-

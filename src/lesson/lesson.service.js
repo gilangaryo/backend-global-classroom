@@ -1,26 +1,48 @@
 import * as LessonRepository from './lesson.repository.js';
-import slugify from 'slugify';
+import { makeSlug } from '../utils/slug.js';
 
 export const getAllLessons = async () => {
     return await LessonRepository.findAll();
 };
 
-export const getLessonById = async (id) => {
-    return await LessonRepository.findById(id);
+export const getLessonByItemId = async (itemId) => {
+    return await LessonRepository.findByItemId(itemId);
 };
 
 export const createLesson = async (data) => {
-    let slug = data.slug;
-    if (!slug && data.title) {
-        slug = slugify(data.title, { lower: true, strict: true });
+    // Slugify title
+    const lessonData = { ...data, slug: makeSlug(data.title) };
+    return await LessonRepository.create(lessonData);
+};
+
+export const updateLesson = async (itemId, data) => {
+    const existing = await LessonRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Lesson not found');
+        err.status = 404;
+        throw err;
     }
-    return await LessonRepository.create({ ...data, slug });
+    let lessonData = { ...data };
+    if (data.title) lessonData.slug = makeSlug(data.title);
+    return await LessonRepository.update(itemId, lessonData);
 };
 
-export const updateLesson = async (id, data) => {
-    return await LessonRepository.update(id, data);
+export const deleteLesson = async (itemId) => {
+    const existing = await LessonRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Lesson not found');
+        err.status = 404;
+        throw err;
+    }
+    return await LessonRepository.remove(itemId);
 };
 
-export const deleteLesson = async (id) => {
-    return await LessonRepository.remove(id);
+export const updateStatus = async (itemId, data) => {
+    const existing = await LessonRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Lesson not found');
+        err.status = 404;
+        throw err;
+    }
+    return await LessonRepository.updateStatus(itemId, data.isActive);
 };

@@ -18,7 +18,7 @@ async function main() {
         previewUrl: 'https://example.com/preview.mp4',
         digitalUrl: 'https://example.com/digital.zip',
         imageUrl: 'https://example.com/image.png',
-        // nested creation of units → subunits → lessons
+        colorButton: '#FF0000',
         units: {
             create: Array.from({ length: 3 }, (_, ui) => {
                 const unitTitle = `Unit ${ui + 1}`;
@@ -41,6 +41,7 @@ async function main() {
                                 previewUrl: null,
                                 digitalUrl: null,
                                 imageUrl: null,
+                                tag: `tag-${ui}-${si}`,
                                 lessons: {
                                     create: {
                                         title: `Lesson untuk ${subTitle}`,
@@ -50,6 +51,7 @@ async function main() {
                                         previewUrl: null,
                                         digitalUrl: null,
                                         imageUrl: null,
+                                        tag: `tag-${ui}-${si}`,
                                     }
                                 }
                             };

@@ -1,53 +1,81 @@
 import * as UnitService from './unit.service.js';
 
-export const getAllUnits = async (req, res) => {
+export const getAllUnits = async (req, res, next) => {
     try {
         const units = await UnitService.getAllUnits();
-        res.json({ status: 'success', data: units });
+        if (!units || units.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Units is empty'
+            });
+        }
+        res.json({
+            status: 'success',
+            data: units,
+            message: 'All units fetched'
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        next(error);
     }
 };
 
-export const getUnitById = async (req, res) => {
+export const getUnitByItemId = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        const unit = await UnitService.getUnitById(id);
+        const itemId = req.params.itemId;
+        const unit = await UnitService.getUnitByItemId(itemId);
         if (!unit) return res.status(404).json({ status: 'error', message: 'Unit not found' });
         res.json({ status: 'success', data: unit });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        next(error);
     }
 };
 
-export const createUnit = async (req, res) => {
+export const createUnit = async (req, res, next) => {
     try {
         const data = req.body;
         const unit = await UnitService.createUnit(data);
-        res.status(201).json({ status: 'success', data: unit });
+        res.status(201).json({
+            status: 'success',
+            data: unit,
+            message: 'Unit created'
+        });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        next(error);
     }
 };
 
-export const updateUnit = async (req, res) => {
+export const updateUnit = async (req, res, next) => {
     try {
-        const id = req.params.id;
+        const itemId = req.params.itemId;
         const data = req.body;
-        const unit = await UnitService.updateUnit(id, data);
+        const unit = await UnitService.updateUnit(itemId, data);
         res.json({ status: 'success', data: unit });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        next(error);
     }
 };
 
-export const deleteUnit = async (req, res) => {
+export const deleteUnit = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        await UnitService.deleteUnit(id);
+        const itemId = req.params.itemId;
+        await UnitService.deleteUnit(itemId);
         res.status(204).json({ status: 'success' });
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        next(error);
     }
 };
 
+export const updateStatus = async (req, res, next) => {
+    try {
+        const itemId = req.params.itemId;
+        const data = req.body;
+        const unit = await UnitService.updateStatus(itemId, data);
+        res.json({
+            status: 'success',
+            data: unit,
+            message: 'Unit status updated'
+        });
+    } catch (error) {
+        next(error);
+    }
+};

@@ -4,14 +4,12 @@ import { z } from 'zod';
 export const CourseSchema = z.object({
     title: z.string().min(3).max(100),
     price: z.number().min(0),
-
-    slug: z.string()
-        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-        .optional(),
-    categoryId: z.number().int().positive().optional(),
-    description: z.string().max(1000).optional(),
+    description: z.string().max(1000),
     digitalUrl: z.string().url().optional(),
-    previewUrl: z.string().url().optional(),
     imageUrl: z.string().url().optional(),
     colorButton: z.string(),
+});
+
+export const CourseStatusSchema = z.object({
+    isActive: z.boolean(),
 });

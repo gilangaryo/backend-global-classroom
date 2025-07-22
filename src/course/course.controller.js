@@ -58,9 +58,9 @@ export const createCourse = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
     try {
-        const id = req.params.id;
+        const itemId = req.params.itemId;
         const data = req.body;
-        const course = await CourseService.updateCourse(id, data);
+        const course = await CourseService.updateCourse(itemId, data);
         res.json({ status: 'success', data: course, message: 'Course updated' });
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message });

@@ -15,25 +15,39 @@ export const getCourseByItemId = async (itemId) => {
 export const createCourse = async (data) => {
     const validData = validateData(CourseSchema, data);
     let slug = makeSlug(validData.title);
-
-
     validData.slug = slug;
-
     return CourseRepository.create({ ...validData });
 };
 
 export const updateCourse = async (itemId, data) => {
+    const existing = await CourseRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Course not found');
+        err.status = 404;
+        throw err;
+    }
     const validData = validateData(CourseSchema, data);
 
     return await CourseRepository.update(itemId, validData);
 };
 
 export const deleteCourse = async (itemId) => {
+    const existing = await CourseRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Course not found');
+        err.status = 404;
+        throw err;
+    }
     return await CourseRepository.remove(itemId);
 };
 
 export const updateStatus = async (itemId, data) => {
-
+    const existing = await CourseRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Course not found');
+        err.status = 404;
+        throw err;
+    }
     if (typeof data.isActive !== 'boolean') {
         throw new Error('isActive field must be a boolean');
     }

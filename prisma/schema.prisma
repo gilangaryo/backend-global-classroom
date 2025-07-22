@@ -204,15 +204,18 @@ model Purchase {
 
 model CheckoutSession {
   id              Int            @id @default(autoincrement())
-  userId          Int
-  user            User           @relation(fields: [userId], references: [id])
   stripeSessionId String         @unique
   status          CheckoutStatus @default(PENDING)
+  amount          Float
+  items           Json
 
-  itemType  ItemType
-  itemId    String
-  amount    Float
+  // Tambahan data user:
+  customerEmail     String?
+  customerFirstName String?
+  customerLastName  String?
+  customerCountry   String?
+
   createdAt DateTime @default(now())
-
-  @@map("checkoutsession")
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
 }

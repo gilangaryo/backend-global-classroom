@@ -1,26 +1,47 @@
 import * as SubunitRepository from './subunit.repository.js';
-import slugify from 'slugify';
+import { makeSlug } from '../utils/slug.js';
 
 export const getAllSubunits = async () => {
     return await SubunitRepository.findAll();
 };
 
-export const getSubunitById = async (id) => {
-    return await SubunitRepository.findById(id);
+export const getSubunitByItemId = async (itemId) => {
+    return await SubunitRepository.findByItemId(itemId);
 };
 
 export const createSubunit = async (data) => {
-    let slug = data.slug;
-    if (!slug && data.title) {
-        slug = slugify(data.title, { lower: true, strict: true });
+    const subunitData = { ...data, slug: makeSlug(data.title) };
+    return await SubunitRepository.create(subunitData);
+};
+
+export const updateSubunit = async (itemId, data) => {
+    const existing = await SubunitRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Subunit not found');
+        err.status = 404;
+        throw err;
     }
-    return await SubunitRepository.create({ ...data, slug });
+    let subunitData = { ...data };
+    if (data.title) subunitData.slug = makeSlug(data.title);
+    return await SubunitRepository.update(itemId, subunitData);
 };
 
-export const updateSubunit = async (id, data) => {
-    return await SubunitRepository.update(id, data);
+export const deleteSubunit = async (itemId) => {
+    const existing = await SubunitRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Subunit not found');
+        err.status = 404;
+        throw err;
+    }
+    return await SubunitRepository.remove(itemId);
 };
 
-export const deleteSubunit = async (id) => {
-    return await SubunitRepository.remove(id);
+export const updateStatus = async (itemId, data) => {
+    const existing = await SubunitRepository.findByItemId(itemId);
+    if (!existing) {
+        const err = new Error('Subunit not found');
+        err.status = 404;
+        throw err;
+    }
+    return await SubunitRepository.updateStatus(itemId, data.isActive);
 };
