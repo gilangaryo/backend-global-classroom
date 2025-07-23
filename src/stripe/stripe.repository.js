@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export const createCheckoutSessionInStripe = async ({ products }) => {
+export const createCheckoutSessionInStripe = async ({ products, email }) => {
     const line_items = products.map(p => ({
         price_data: {
             currency: 'usd',
@@ -21,5 +21,26 @@ export const createCheckoutSessionInStripe = async ({ products }) => {
         line_items,
         success_url: process.env.FRONTEND_SUCCESS_URL + '?session_id={CHECKOUT_SESSION_ID}',
         cancel_url: process.env.FRONTEND_CANCEL_URL,
+        customer_email: email,
     });
 };
+
+export async function markCheckoutSessionPaid(sessionId) {
+    return await prisma.checkoutSession.update({
+        where: { stripeSessionId: sessionId },
+        data: { status: 'PAID' },
+    });
+}
+
+export async function markCheckoutSessionCancelled(sessionId) {
+    return await prisma.checkoutSession.update({
+        where: { stripeSessionId: sessionId },
+        data: { status: 'CANCELLED' },
+    });
+}
+
+export async function findCheckoutSession(sessionId) {
+    return await prisma.checkoutSession.findUnique({
+        where: { stripeSessionId: sessionId },
+    });
+}

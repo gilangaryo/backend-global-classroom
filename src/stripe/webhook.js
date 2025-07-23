@@ -1,79 +1,73 @@
 import Stripe from 'stripe';
 import express from 'express';
-import prisma from '../prisma/client.js';
-import nodemailer from 'nodemailer';
+import {
+    markCheckoutSessionPaid,
+    markCheckoutSessionCancelled,
+    findCheckoutSession,
+} from './stripe.repository.js';
+import { sendProductAccessEmail } from '../utils/sendProductAccessEmail.js';
 
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-router.post('/', express.raw({ type: 'application/json' }), async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    let event;
-    try {
-        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-        console.log("Stripe event received:", event.type);
+router.post(
+    '/',
+    express.raw({ type: 'application/json' }),
+    async (req, res) => {
+        const sig = req.headers['stripe-signature'];
+        let event;
+        try {
+            event = stripe.webhooks.constructEvent(
+                req.body,
+                sig,
+                process.env.STRIPE_WEBHOOK_SECRET
+            );
+            console.log('Stripe event received:', event.type);
 
-        if (event.type === 'checkout.session.completed') {
             const session = event.data.object;
-            const checkout = await prisma.checkoutSession.findUnique({
-                where: { stripeSessionId: session.id }
-            });
+            let checkout;
 
-            if (!checkout) {
-                console.error("CheckoutSession not found for stripeSessionId:", session.id);
-                return res.status(404).send('CheckoutSession not found');
-            }
+            if (
+                event.type === 'checkout.session.completed' ||
+                event.type === 'checkout.session.async_payment_succeeded'
+            ) {
+                checkout = await findCheckoutSession(session.id);
 
-            await prisma.checkoutSession.update({
-                where: { stripeSessionId: session.id },
-                data: { status: 'PAID' }
-            });
+                if (!checkout) {
+                    console.error('CheckoutSession not found for stripeSessionId:', session.id);
+                    return res.status(404).send('CheckoutSession not found');
+                }
 
-            const { customerEmail, items } = checkout;
-            if (customerEmail && items) {
-                const productList = items
-                    .map(item =>
-                        item.digitalUrl
-                            ? `<li><strong>${item.title}:</strong> <a href="${item.digitalUrl}">${item.digitalUrl}</a></li>`
-                            : `<li><strong>${item.title}</strong> (Tidak ada link)</li>`
-                    )
-                    .join('');
+                await markCheckoutSessionPaid(session.id);
 
                 try {
-                    const transporter = nodemailer.createTransport({
-                        host: process.env.SMTP_HOST,
-                        port: process.env.SMTP_PORT,
-                        secure: false,
-                        auth: {
-                            user: process.env.SMTP_USER,
-                            pass: process.env.SMTP_PASS
-                        }
+                    await sendProductAccessEmail({
+                        to: checkout.customerEmail,
+                        items: checkout.items,
                     });
-
-                    await transporter.sendMail({
-                        from: `"Global Classroom" <${process.env.SMTP_USER}>`,
-                        to: customerEmail,
-                        subject: "Akses Digital Product Kamu",
-                        html: `
-                            <h2>Terima kasih sudah membeli produk digital kami!</h2>
-                            <p>Berikut daftar link akses digital product kamu:</p>
-                            <ul>${productList}</ul>
-                            <br>
-                            <p>Salam,<br/>Global Classroom Team</p>
-                        `
-                    });
-                    console.log("Email sent to:", customerEmail);
+                    console.log('Email sent to:', checkout.customerEmail);
                 } catch (emailErr) {
-                    console.error("Failed to send email:", emailErr);
+                    console.error('Failed to send email:', emailErr);
                 }
             }
-        }
 
-        res.status(200).json({ received: true });
-    } catch (err) {
-        console.error('Webhook error:', err);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
+            if (
+                event.type === 'checkout.session.async_payment_failed' ||
+                event.type === 'checkout.session.expired'
+            ) {
+                checkout = await findCheckoutSession(session.id);
+                if (checkout) {
+                    await markCheckoutSessionCancelled(session.id);
+                    console.log('CheckoutSession marked as CANCELLED for', session.id);
+                }
+            }
+
+            res.status(200).json({ received: true });
+        } catch (err) {
+            console.error('Webhook error:', err);
+            return res.status(400).send(`Webhook Error: ${err.message}`);
+        }
     }
-});
+);
 
 export default router;

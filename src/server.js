@@ -49,7 +49,7 @@ app.use('/api/lessons', lessonRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/payment', express.json(), stripeRoutes);
+app.use('/api/payment', stripeRoutes);
 
 app.get('/', (req, res) => {
     res.send(`<div style="text-align: center;">

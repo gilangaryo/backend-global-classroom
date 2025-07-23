@@ -3,7 +3,7 @@ import prisma from '../prisma/client.js';
 
 export const createCheckoutSession = async (req, res, next) => {
     try {
-        const { userId, items } = req.body;
+        const { userId, items, email, firstName, lastName, country } = req.body;
         if (!Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ status: 'error', message: 'Items required' });
         }
@@ -12,10 +12,9 @@ export const createCheckoutSession = async (req, res, next) => {
             COURSE: prisma.course,
             UNIT: prisma.unit,
             SUBUNIT: prisma.subunit,
-            LESSON: prisma.lesson
+            LESSON: prisma.lesson,
         };
 
-        // Fetch semua produk
         const products = [];
         for (const { itemId, itemType } of items) {
             const model = modelMap[itemType];
@@ -37,8 +36,7 @@ export const createCheckoutSession = async (req, res, next) => {
             return res.status(404).json({ status: 'error', message: 'Products not found' });
         }
 
-        // Buat Stripe Checkout session untuk semua produk (line_items)
-        const session = await createStripeCheckoutSession({ products });
+        const session = await createStripeCheckoutSession({ products, email });
 
         await prisma.checkoutSession.create({
             data: {
@@ -53,16 +51,15 @@ export const createCheckoutSession = async (req, res, next) => {
                     imageUrl: p.imageUrl,
                     digitalUrl: p.digitalUrl,
                 })),
-                customerEmail: req.body.email,
-                customerFirstName: req.body.firstName,
-                customerLastName: req.body.lastName,
-                customerCountry: req.body.country,
-            }
+                customerEmail: email || null,
+                customerFirstName: firstName || null,
+                customerLastName: lastName || null,
+                customerCountry: country || null,
+                userId: userId || null,
+            },
         });
 
-
-
-        res.status(200).json({
+        return res.status(200).json({
             status: 'success',
             url: session.url,
             sessionId: session.id,
