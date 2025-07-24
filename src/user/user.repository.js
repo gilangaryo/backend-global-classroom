@@ -13,7 +13,7 @@ export const findAllUsers = async () => {
 
 export const findUserById = async (id) => {
     return prisma.user.findUnique({
-        where: { id: Number(id) },
+        where: { id: id },
         select: {
             id: true,
             name: true,
@@ -35,14 +35,14 @@ export const createUser = async (data) => {
 
 export const updateUser = async (id, data) => {
     return prisma.user.update({
-        where: { id: Number(id) },
+        where: { id: id },
         data,
     });
 };
 
 export const deleteUser = async (id) => {
     return prisma.user.delete({
-        where: { id: Number(id) },
+        where: { id: id },
     });
 };
 
