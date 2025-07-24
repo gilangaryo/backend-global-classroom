@@ -6,8 +6,8 @@ export const getAllUnits = async () => {
     return await UnitRepository.findAll();
 };
 
-export const getUnitByItemId = async (itemId) => {
-    return await UnitRepository.findByItemId(itemId);
+export const getUnitByItemId = async (id) => {
+    return await UnitRepository.findByItemId(id);
 };
 
 export const createUnit = async (data) => {
@@ -17,28 +17,28 @@ export const createUnit = async (data) => {
     return await UnitRepository.create({ ...validData });
 };
 
-export const updateUnit = async (itemId, data) => {
-    const existing = await UnitRepository.findByItemId(itemId);
+export const updateUnit = async (id, data) => {
+    const existing = await UnitRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Unit not found');
         err.status = 404;
         throw err;
     }
-    return await UnitRepository.update(itemId, data);
+    return await UnitRepository.update(id, data);
 };
 
-export const deleteUnit = async (itemId) => {
-    const existing = await UnitRepository.findByItemId(itemId);
+export const deleteUnit = async (id) => {
+    const existing = await UnitRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Unit not found');
         err.status = 404;
         throw err;
     }
-    return await UnitRepository.remove(itemId);
+    return await UnitRepository.remove(id);
 };
 
-export const updateStatus = async (itemId, data) => {
-    const existing = await UnitRepository.findByItemId(itemId);
+export const updateStatus = async (id, data) => {
+    const existing = await UnitRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Unit not found');
         err.status = 404;
@@ -49,5 +49,5 @@ export const updateStatus = async (itemId, data) => {
     }
     const status = data.isActive
 
-    return await UnitRepository.updateStatus(itemId, status);
+    return await UnitRepository.updateStatus(id, status);
 };

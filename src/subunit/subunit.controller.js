@@ -21,8 +21,8 @@ export const getAllSubunits = async (req, res, next) => {
 
 export const getSubunitByItemId = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        const subunit = await SubunitService.getSubunitByItemId(itemId);
+        const id = req.params.id;
+        const subunit = await SubunitService.getSubunitByItemId(id);
         if (!subunit) return res.status(404).json({ status: 'error', message: 'Subunit not found' });
         res.json({ status: 'success', data: subunit });
     } catch (error) {
@@ -46,8 +46,8 @@ export const createSubunit = async (req, res, next) => {
 
 export const updateSubunit = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        const subunit = await SubunitService.updateSubunit(itemId, req.body);
+        const id = req.params.id;
+        const subunit = await SubunitService.updateSubunit(id, req.body);
         res.json({ status: 'success', data: subunit });
     } catch (error) {
         next(error);
@@ -56,8 +56,8 @@ export const updateSubunit = async (req, res, next) => {
 
 export const deleteSubunit = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        await SubunitService.deleteSubunit(itemId);
+        const id = req.params.id;
+        await SubunitService.deleteSubunit(id);
         res.status(204).json({ status: 'success' });
     } catch (error) {
         next(error);
@@ -66,8 +66,8 @@ export const deleteSubunit = async (req, res, next) => {
 
 export const updateStatus = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        const subunit = await SubunitService.updateStatus(itemId, req.body);
+        const id = req.params.id;
+        const subunit = await SubunitService.updateStatus(id, req.body);
         res.json({
             status: 'success',
             data: subunit,

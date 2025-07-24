@@ -8,8 +8,8 @@ export const getAllCourses = async () => {
     return await CourseRepository.findAll();
 };
 
-export const getCourseByItemId = async (itemId) => {
-    return await CourseRepository.findByItemId(itemId);
+export const getCourseByItemId = async (id) => {
+    return await CourseRepository.findByItemId(id);
 };
 
 export const createCourse = async (data) => {
@@ -19,8 +19,8 @@ export const createCourse = async (data) => {
     return CourseRepository.create({ ...validData });
 };
 
-export const updateCourse = async (itemId, data) => {
-    const existing = await CourseRepository.findByItemId(itemId);
+export const updateCourse = async (id, data) => {
+    const existing = await CourseRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Course not found');
         err.status = 404;
@@ -28,21 +28,21 @@ export const updateCourse = async (itemId, data) => {
     }
     const validData = validateData(CourseSchema, data);
 
-    return await CourseRepository.update(itemId, validData);
+    return await CourseRepository.update(id, validData);
 };
 
-export const deleteCourse = async (itemId) => {
-    const existing = await CourseRepository.findByItemId(itemId);
+export const deleteCourse = async (id) => {
+    const existing = await CourseRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Course not found');
         err.status = 404;
         throw err;
     }
-    return await CourseRepository.remove(itemId);
+    return await CourseRepository.remove(id);
 };
 
-export const updateStatus = async (itemId, data) => {
-    const existing = await CourseRepository.findByItemId(itemId);
+export const updateStatus = async (id, data) => {
+    const existing = await CourseRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Course not found');
         err.status = 404;
@@ -53,5 +53,5 @@ export const updateStatus = async (itemId, data) => {
     }
     const status = data.isActive
 
-    return await CourseRepository.updateStatus(itemId, status);
+    return await CourseRepository.updateStatus(id, status);
 };

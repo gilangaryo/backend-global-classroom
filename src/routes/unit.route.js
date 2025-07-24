@@ -6,10 +6,10 @@ import { UnitSchema, UnitStatusSchema } from '../schemas/unit.schema.js';
 const router = Router();
 
 router.get('/', UnitController.getAllUnits);
-router.get('/:itemId', UnitController.getUnitByItemId);
+router.get('/:id', UnitController.getUnitByItemId);
 router.post('/', validate(UnitSchema), UnitController.createUnit);
-router.put('/:itemId', validate(UnitSchema), UnitController.updateUnit);
-router.delete('/:itemId', UnitController.deleteUnit);
-router.patch('/status/:itemId', validate(UnitStatusSchema), UnitController.updateStatus);
+router.put('/:id', validate(UnitSchema), UnitController.updateUnit);
+router.delete('/:id', UnitController.deleteUnit);
+router.patch('/status/:id', validate(UnitStatusSchema), UnitController.updateStatus);
 
 export default router;

@@ -21,8 +21,8 @@ export const getAllCourses = async (req, res) => {
 
 export const getCourseByItemId = async (req, res) => {
     try {
-        const itemId = req.params.itemId;
-        const course = await CourseService.getCourseByItemId(itemId);
+        const id = req.params.id;
+        const course = await CourseService.getCourseByItemId(id);
         if (!course || course.length === 0) {
             return res.status(404).json({
                 status: 'error',
@@ -58,9 +58,9 @@ export const createCourse = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
     try {
-        const itemId = req.params.itemId;
+        const id = req.params.id;
         const data = req.body;
-        const course = await CourseService.updateCourse(itemId, data);
+        const course = await CourseService.updateCourse(id, data);
         res.json({ status: 'success', data: course, message: 'Course updated' });
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message });
@@ -79,9 +79,9 @@ export const deleteCourse = async (req, res) => {
 
 export const updateStatus = async (req, res) => {
     try {
-        const itemId = req.params.itemId;
+        const id = req.params.id;
         const data = req.body;
-        const course = await CourseService.updateStatus(itemId, data);
+        const course = await CourseService.updateStatus(id, data);
         res.json({
             status: 'success',
             data: course,

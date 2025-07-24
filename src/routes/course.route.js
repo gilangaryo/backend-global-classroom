@@ -5,10 +5,10 @@ import { CourseSchema, CourseStatusSchema } from '../schemas/course.schema.js';
 const router = Router();
 
 router.get('/', CourseController.getAllCourses);
-router.get('/:itemId', CourseController.getCourseByItemId);
+router.get('/:id', CourseController.getCourseByItemId);
 router.post('/', validate(CourseSchema), CourseController.createCourse);
-router.put('/:itemId', validate(CourseSchema), CourseController.updateCourse);
-router.delete('/:itemId', CourseController.deleteCourse);
-router.patch('/status/:itemId', CourseController.updateStatus);
+router.put('/:id', validate(CourseSchema), CourseController.updateCourse);
+router.delete('/:id', CourseController.deleteCourse);
+router.patch('/status/:id', CourseController.updateStatus);
 
 export default router;

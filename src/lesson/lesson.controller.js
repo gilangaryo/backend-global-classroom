@@ -1,8 +1,16 @@
 import * as LessonService from './lesson.service.js';
 
+// lesson.controller.js
 export const getAllLessons = async (req, res, next) => {
     try {
-        const lessons = await LessonService.getAllLessons();
+        // parseInt jika ada
+        const filter = {
+            courseId: req.query.courseId || undefined,
+            unitId: req.query.unitId || undefined,
+            subunitId: req.query.subunitId || undefined,
+            search: req.query.search,
+        };
+        const lessons = await LessonService.getAllLessons(filter);
         if (!lessons || lessons.length === 0) {
             return res.status(404).json({
                 status: 'error',
@@ -19,10 +27,12 @@ export const getAllLessons = async (req, res, next) => {
     }
 };
 
+
+
 export const getLessonByItemId = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        const lesson = await LessonService.getLessonByItemId(itemId);
+        const id = req.params.id;
+        const lesson = await LessonService.getLessonByItemId(id);
         if (!lesson) return res.status(404).json({ status: 'error', message: 'Lesson not found' });
         res.json({ status: 'success', data: lesson });
     } catch (error) {
@@ -45,8 +55,8 @@ export const createLesson = async (req, res, next) => {
 
 export const updateLesson = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        const lesson = await LessonService.updateLesson(itemId, req.body);
+        const id = req.params.id;
+        const lesson = await LessonService.updateLesson(id, req.body);
         res.json({ status: 'success', data: lesson });
     } catch (error) {
         next(error);
@@ -55,8 +65,8 @@ export const updateLesson = async (req, res, next) => {
 
 export const deleteLesson = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        await LessonService.deleteLesson(itemId);
+        const id = req.params.id;
+        await LessonService.deleteLesson(id);
         res.status(204).json({ status: 'success' });
     } catch (error) {
         next(error);
@@ -65,8 +75,8 @@ export const deleteLesson = async (req, res, next) => {
 
 export const updateStatus = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        const lesson = await LessonService.updateStatus(itemId, req.body);
+        const id = req.params.id;
+        const lesson = await LessonService.updateStatus(id, req.body);
         res.json({
             status: 'success',
             data: lesson,

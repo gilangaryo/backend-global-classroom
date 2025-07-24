@@ -5,8 +5,8 @@ export const getAllSubunits = async () => {
     return await SubunitRepository.findAll();
 };
 
-export const getSubunitByItemId = async (itemId) => {
-    return await SubunitRepository.findByItemId(itemId);
+export const getSubunitByItemId = async (id) => {
+    return await SubunitRepository.findByItemId(id);
 };
 
 export const createSubunit = async (data) => {
@@ -14,8 +14,8 @@ export const createSubunit = async (data) => {
     return await SubunitRepository.create(subunitData);
 };
 
-export const updateSubunit = async (itemId, data) => {
-    const existing = await SubunitRepository.findByItemId(itemId);
+export const updateSubunit = async (id, data) => {
+    const existing = await SubunitRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Subunit not found');
         err.status = 404;
@@ -23,25 +23,25 @@ export const updateSubunit = async (itemId, data) => {
     }
     let subunitData = { ...data };
     if (data.title) subunitData.slug = makeSlug(data.title);
-    return await SubunitRepository.update(itemId, subunitData);
+    return await SubunitRepository.update(id, subunitData);
 };
 
-export const deleteSubunit = async (itemId) => {
-    const existing = await SubunitRepository.findByItemId(itemId);
+export const deleteSubunit = async (id) => {
+    const existing = await SubunitRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Subunit not found');
         err.status = 404;
         throw err;
     }
-    return await SubunitRepository.remove(itemId);
+    return await SubunitRepository.remove(id);
 };
 
-export const updateStatus = async (itemId, data) => {
-    const existing = await SubunitRepository.findByItemId(itemId);
+export const updateStatus = async (id, data) => {
+    const existing = await SubunitRepository.findByItemId(id);
     if (!existing) {
         const err = new Error('Subunit not found');
         err.status = 404;
         throw err;
     }
-    return await SubunitRepository.updateStatus(itemId, data.isActive);
+    return await SubunitRepository.updateStatus(id, data.isActive);
 };

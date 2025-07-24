@@ -12,7 +12,7 @@ export const SubunitSchema = z.object({
 });
 
 export const SubunitUpdateSchema = z.object({
-    itemId: z.string().uuid().optional(),
+    id: z.string().uuid().optional(),
     title: z.string().min(1, 'Title wajib diisi').optional(),
     previewUrl: z.string().url('URL tidak valid').optional().nullable(),
     digitalUrl: z.string().url('URL tidak valid').optional().nullable(),

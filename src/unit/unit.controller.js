@@ -21,8 +21,8 @@ export const getAllUnits = async (req, res, next) => {
 
 export const getUnitByItemId = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        const unit = await UnitService.getUnitByItemId(itemId);
+        const id = req.params.id;
+        const unit = await UnitService.getUnitByItemId(id);
         if (!unit) return res.status(404).json({ status: 'error', message: 'Unit not found' });
         res.json({ status: 'success', data: unit });
     } catch (error) {
@@ -46,9 +46,9 @@ export const createUnit = async (req, res, next) => {
 
 export const updateUnit = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
+        const id = req.params.id;
         const data = req.body;
-        const unit = await UnitService.updateUnit(itemId, data);
+        const unit = await UnitService.updateUnit(id, data);
         res.json({ status: 'success', data: unit });
     } catch (error) {
         next(error);
@@ -57,8 +57,8 @@ export const updateUnit = async (req, res, next) => {
 
 export const deleteUnit = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
-        await UnitService.deleteUnit(itemId);
+        const id = req.params.id;
+        await UnitService.deleteUnit(id);
         res.status(204).json({ status: 'success' });
     } catch (error) {
         next(error);
@@ -67,9 +67,9 @@ export const deleteUnit = async (req, res, next) => {
 
 export const updateStatus = async (req, res, next) => {
     try {
-        const itemId = req.params.itemId;
+        const id = req.params.id;
         const data = req.body;
-        const unit = await UnitService.updateStatus(itemId, data);
+        const unit = await UnitService.updateStatus(id, data);
         res.json({
             status: 'success',
             data: unit,

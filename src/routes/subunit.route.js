@@ -6,10 +6,10 @@ import { SubunitSchema, SubunitUpdateSchema, SubunitStatusSchema } from '../sche
 const router = Router();
 
 router.get('/', SubunitController.getAllSubunits);
-router.get('/:itemId', SubunitController.getSubunitByItemId);
+router.get('/:id', SubunitController.getSubunitByItemId);
 router.post('/', validate(SubunitSchema), SubunitController.createSubunit);
-router.put('/:itemId', validate(SubunitUpdateSchema), SubunitController.updateSubunit);
-router.delete('/:itemId', SubunitController.deleteSubunit);
-router.patch('/status/:itemId', validate(SubunitStatusSchema), SubunitController.updateStatus);
+router.put('/:id', validate(SubunitUpdateSchema), SubunitController.updateSubunit);
+router.delete('/:id', SubunitController.deleteSubunit);
+router.patch('/status/:id', validate(SubunitStatusSchema), SubunitController.updateStatus);
 
 export default router;
