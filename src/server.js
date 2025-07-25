@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+// import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 
 import { sessionMiddleware } from './middleware/session.middleware.js';
