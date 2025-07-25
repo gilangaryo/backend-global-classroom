@@ -22,7 +22,6 @@ import cartRoutes from './routes/cart.route.js';
 
 import stripeWebhook from './stripe/webhook.js';
 
-
 dotenv.config();
 
 const app = express();
@@ -39,14 +38,25 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+
 app.use('/api/payment/webhook', stripeWebhook);
 
-app.use(cors());
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+app.use(
+    cors({
+        origin: FRONTEND_URL,
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    })
+);
+
 app.use(express.json());
 app.use(morgan('dev'));
 
 app.use(cookieParser());
 app.use(sessionMiddleware);
+
 app.use('/uploads', express.static('uploads'));
 app.use('/api/upload', uploadRoutes);
 app.use('/api/courses', courseRoutes);
