@@ -28,15 +28,15 @@ const app = express();
 
 app.use(helmet());
 
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: {
-        status: 'error',
-        message: 'Terlalu banyak permintaan dari IP ini, coba lagi nanti.',
-    },
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//     windowMs: 15 * 60 * 1000,
+//     max: 100,
+//     message: {
+//         status: 'error',
+//         message: 'Terlalu banyak permintaan dari IP ini, coba lagi nanti.',
+//     },
+// });
+// app.use(limiter);
 
 
 app.use('/api/payment/webhook', stripeWebhook);
