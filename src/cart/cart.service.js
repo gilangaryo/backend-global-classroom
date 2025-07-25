@@ -1,17 +1,19 @@
 import * as CartRepo from './cart.repository.js';
 
-export const addToCart = async ({ sessionId, productId, productType, quantity }) => {
-    if (!productId || !productType || !quantity || quantity <= 0) {
-        const err = new Error('Field tidak valid pada request');
+export const addToCart = async ({ sessionId, productId, productType }) => {
+    if (!productId || !productType) {
+        const err = new Error('productId & productType harus diisi');
         err.status = 400;
         throw err;
     }
 
-    return await CartRepo.upsertCartItem(sessionId, productId, productType, quantity);
+    const quantity = 1;
+
+    return CartRepo.upsertCartItem({ sessionId, productId, productType, quantity });
 };
 
 export const getCart = async (sessionId) => {
-    return await CartRepo.findCartBySession(sessionId);
+    return CartRepo.findCartBySession(sessionId);
 };
 
 export const removeFromCart = async ({ sessionId, productId }) => {
@@ -28,5 +30,5 @@ export const removeFromCart = async ({ sessionId, productId }) => {
         throw err;
     }
 
-    return await CartRepo.deleteCartItem(sessionId, productId);
+    return CartRepo.deleteCartItem(sessionId, productId);
 };

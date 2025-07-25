@@ -6,7 +6,6 @@ export const addToCart = async (req, res, next) => {
             sessionId: req.session_id,
             productId: req.body.productId,
             productType: req.body.productType,
-            quantity: req.body.quantity,
         });
 
         res.json({ status: 'success', data });
