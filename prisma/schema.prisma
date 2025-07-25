@@ -190,7 +190,6 @@ model CheckoutSession {
   amount          Float
   items           Json
 
-  // Tambahan data user:
   customerEmail     String?
   customerFirstName String?
   customerLastName  String?
@@ -199,4 +198,17 @@ model CheckoutSession {
   createdAt DateTime @default(now())
   User      User?    @relation(fields: [userId], references: [id])
   userId    String?
+}
+
+model Cart {
+  id          String   @id @default(cuid())
+  sessionId   String
+  productId   String
+  productType ItemType
+  quantity    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, productId])
 }

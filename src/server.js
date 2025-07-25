@@ -4,6 +4,10 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
+
+import { sessionMiddleware } from './middleware/session.middleware.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 import courseRoutes from './routes/course.route.js';
 import unitRoutes from './routes/unit.route.js';
@@ -14,9 +18,10 @@ import userRoutes from './routes/user.route.js';
 import categoryRoutes from './routes/category.route.js';
 import uploadRoutes from './routes/upload.route.js';
 import stripeRoutes from './routes/stripe.route.js';
+import cartRoutes from './routes/cart.route.js';
+
 import stripeWebhook from './stripe/webhook.js';
 
-import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 
@@ -40,6 +45,8 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
+app.use(cookieParser());
+app.use(sessionMiddleware);
 app.use('/uploads', express.static('uploads'));
 app.use('/api/upload', uploadRoutes);
 app.use('/api/courses', courseRoutes);
@@ -50,6 +57,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/payment', stripeRoutes);
+app.use('/api/cart', cartRoutes);
 
 app.get('/', (req, res) => {
     res.send(`<div style="text-align: center;">
