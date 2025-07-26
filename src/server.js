@@ -41,15 +41,19 @@ app.use(helmet());
 
 app.use('/api/payment/webhook', stripeWebhook);
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
-app.use(
-    cors({
-        origin: FRONTEND_URL,
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-    })
-);
+// const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+// app.use(
+//     cors({
+//         origin: FRONTEND_URL,
+//         credentials: true,
+//         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+//         allowedHeaders: ['Content-Type', 'Authorization'],
+//     })
+// );
+app.use(cors({
+    origin: '*',
+    credentials: true,
+}));
 
 app.use(express.json());
 app.use(morgan('dev'));
