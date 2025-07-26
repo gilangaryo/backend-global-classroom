@@ -9,7 +9,7 @@ export async function fetchProductsBatch(items) {
         SUBUNIT: [],
         LESSON: [],
     };
-    for (const i of items) typeIds[i.itemType]?.push(i.id);
+    for (const i of items) typeIds[i.itemType]?.push(i.itemId);
 
     const [courses, units, subunits, lessons] = await Promise.all([
         typeIds.COURSE.length ? prisma.course.findMany({ where: { id: { in: typeIds.COURSE } } }) : [],
@@ -22,8 +22,8 @@ export async function fetchProductsBatch(items) {
         itemMap[`${item.id}`] = item;
     }
     return items
-        .map(({ id, itemType }) => {
-            const item = itemMap[id];
+        .map(({ itemId, itemType }) => {
+            const item = itemMap[itemId];
             return item
                 ? {
                     itemType,
