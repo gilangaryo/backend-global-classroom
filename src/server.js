@@ -20,6 +20,7 @@ import uploadRoutes from './routes/upload.route.js';
 import stripeRoutes from './routes/stripe.route.js';
 import cartRoutes from './routes/cart.route.js';
 import featuredRoutes from './routes/featured.route.js';
+import validateRoutes from './routes/validate.route.js';
 
 import stripeWebhook from './stripe/webhook.js';
 
@@ -74,6 +75,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/payment', stripeRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/featured', featuredRoutes);
+app.use('/api/validate', validateRoutes);
 
 app.get('/', (req, res) => {
     res.send(`<div style="text-align: center;">
