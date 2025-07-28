@@ -2,22 +2,24 @@ import * as CourseService from './course.service.js';
 
 export const getAllCourses = async (req, res) => {
     try {
-        const courses = await CourseService.getAllCourses();
-        if (!courses || courses.length === 0) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'Courses not found'
-            });
-        }
+        const { page = 1, limit = 10, search = '' } = req.query;
+        const result = await CourseService.getAllCoursesWithPagination({ page, limit, search });
+
         res.json({
             status: 'success',
-            data: courses,
-            message: 'All courses fetched'
+            data: result.data,
+            pagination: {
+                page: result.page,
+                totalPages: result.totalPages,
+                totalItems: result.totalItems,
+            },
+            message: 'Courses fetched with pagination',
         });
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message });
     }
 };
+
 
 export const getCourseByItemId = async (req, res) => {
     try {

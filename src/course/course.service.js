@@ -4,9 +4,19 @@ import { validateData } from '../middleware/validateData.js';
 import { CourseSchema } from '../schemas/course.schema.js';
 
 
-export const getAllCourses = async () => {
-    return await CourseRepository.findAll();
+export const getAllCoursesWithPagination = async ({ page, limit, search }) => {
+    const pageInt = parseInt(page);
+    const limitInt = parseInt(limit);
+    const skip = (pageInt - 1) * limitInt;
+
+    return await CourseRepository.findAllWithPagination({
+        skip,
+        take: limitInt,
+        search,
+        page: pageInt,
+    });
 };
+
 
 export const getCourseByItemId = async (id) => {
     return await CourseRepository.findByItemId(id);

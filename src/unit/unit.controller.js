@@ -2,17 +2,31 @@ import * as UnitService from './unit.service.js';
 
 export const getAllUnits = async (req, res, next) => {
     try {
-        const units = await UnitService.getAllUnits();
-        if (!units || units.length === 0) {
+        const filter = {
+            courseId: req.query.courseId || undefined,
+            search: req.query.search || '',
+            page: parseInt(req.query.page) || 1,
+            limit: parseInt(req.query.limit) || 10,
+        };
+
+        const result = await UnitService.getAllUnits(filter);
+
+        if (!result || result.data.length === 0) {
             return res.status(404).json({
                 status: 'error',
-                message: 'Units is empty'
+                message: 'Units is empty',
             });
         }
+
         res.json({
             status: 'success',
-            data: units,
-            message: 'All units fetched'
+            data: result.data,
+            pagination: {
+                page: result.page,
+                totalItems: result.totalItems,
+                totalPages: result.totalPages,
+            },
+            message: 'All units fetched',
         });
     } catch (error) {
         next(error);

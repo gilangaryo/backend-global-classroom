@@ -58,3 +58,53 @@ export const updateStatus = async (id, status) => {
         data: { isActive: status },
     });
 };
+
+export const findAllWithPagination = async ({ courseId, unitId, subunitId, search, skip, take, page }) => {
+    const where = {
+        AND: [],
+    };
+
+    if (search) {
+        where.AND.push({
+            OR: [
+                { title: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+            ],
+        });
+    }
+
+    if (unitId) {
+        where.AND.push({ unitId });
+    }
+
+    if (subunitId) {
+        where.AND.push({ subunitId });
+    }
+
+    if (courseId) {
+        where.AND.push({
+            unit: { courseId },
+        });
+    }
+
+    const [data, totalItems] = await Promise.all([
+        prisma.lesson.findMany({
+            where,
+            skip,
+            take,
+            include: {
+                unit: true,
+                subunit: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        }),
+        prisma.lesson.count({ where }),
+    ]);
+
+    return {
+        data,
+        page,
+        totalItems,
+        totalPages: Math.ceil(totalItems / take),
+    };
+};

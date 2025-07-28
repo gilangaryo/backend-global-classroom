@@ -3,8 +3,13 @@ import { makeSlug } from '../utils/slug.js';
 
 // lesson.service.js
 export const getAllLessons = async (filter = {}) => {
-    return await LessonRepository.findAll(filter);
+    const page = filter.page || 1;
+    const limit = filter.limit || 10;
+    const skip = (page - 1) * limit;
+
+    return await LessonRepository.findAllWithPagination({ ...filter, skip, take: limit, page });
 };
+
 
 
 export const getLessonByItemId = async (id) => {

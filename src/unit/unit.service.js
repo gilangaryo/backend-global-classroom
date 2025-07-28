@@ -2,8 +2,12 @@ import * as UnitRepository from './unit.repository.js';
 import { makeSlug } from '../utils/slug.js';
 import { validateData } from '../middleware/validateData.js';
 import { UnitSchema } from '../schemas/unit.schema.js';
-export const getAllUnits = async () => {
-    return await UnitRepository.findAll();
+export const getAllUnits = async (filter = {}) => {
+    const page = filter.page || 1;
+    const limit = filter.limit || 10;
+    const skip = (page - 1) * limit;
+
+    return await UnitRepository.findAllWithPagination({ ...filter, skip, take: limit, page });
 };
 
 export const getUnitByItemId = async (id) => {

@@ -3,24 +3,32 @@ import * as LessonService from './lesson.service.js';
 // lesson.controller.js
 export const getAllLessons = async (req, res, next) => {
     try {
-        // parseInt jika ada
         const filter = {
             courseId: req.query.courseId || undefined,
             unitId: req.query.unitId || undefined,
             subunitId: req.query.subunitId || undefined,
-            search: req.query.search,
+            search: req.query.search || '',
+            page: parseInt(req.query.page) || 1,
+            limit: parseInt(req.query.limit) || 10,
         };
-        const lessons = await LessonService.getAllLessons(filter);
-        if (!lessons || lessons.length === 0) {
+
+        const result = await LessonService.getAllLessons(filter);
+
+        if (!result || result.data.length === 0) {
             return res.status(404).json({
                 status: 'error',
-                message: 'Lessons is empty'
+                message: 'Lessons is empty',
             });
         }
         res.json({
             status: 'success',
-            data: lessons,
-            message: 'All lessons fetched'
+            data: result.data,
+            pagination: {
+                page: result.page,
+                totalItems: result.totalItems,
+                totalPages: result.totalPages,
+            },
+            message: 'All lessons fetched',
         });
     } catch (error) {
         next(error);
