@@ -3,6 +3,7 @@ import {
     getAllUnits,
     getAllSubunits,
     getAllLessons,
+    getSuggestions
 } from './featured.repository.js';
 
 function addType(items, type) {
@@ -27,4 +28,9 @@ export async function getFeaturedResources() {
     return combined
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 2);
+}
+
+export async function getSuggestionsService() {
+    const data = await getSuggestions();
+    return data.slice(0, 6);
 }
