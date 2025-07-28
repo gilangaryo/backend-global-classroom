@@ -17,10 +17,19 @@ export const findAll = async () => {
 
 export const findByItemId = async (id) => {
     return prisma.course.findUnique({
-        where: { id: id },
-        include: { units: true, category: true },
+        where: { id },
+        include: {
+            units: {
+                include: {
+                    subunits: true,
+                    lessons: true,
+                },
+            },
+            category: true,
+        },
     });
 };
+
 
 export const create = async (data) => {
     return prisma.course.create({ data });
