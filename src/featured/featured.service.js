@@ -3,7 +3,9 @@ import {
     getAllUnits,
     getAllSubunits,
     getAllLessons,
-    getSuggestions
+    getSuggestions,
+    getBundleUnits,
+    getBundleByLessonId
 } from './featured.repository.js';
 
 function addType(items, type) {
@@ -33,4 +35,23 @@ export async function getFeaturedResources() {
 export async function getSuggestionsService() {
     const data = await getSuggestions();
     return data.slice(0, 6);
+}
+
+export async function getBundlesService() {
+    const [courses, units] = await Promise.all([
+        getBundleCourses(), // Ambil 1 course terbaru
+        getBundleUnits(),   // Ambil 1 unit terbaru
+    ]);
+
+    const combined = [
+        ...units.map(item => ({ ...item, type: 'UNIT' })),
+        ...courses.map(item => ({ ...item, type: 'COURSE' })),
+    ];
+
+    return combined;
+}
+
+
+export async function getBundlesByLessonIdService(lessonId) {
+    return await getBundleByLessonId(lessonId);
 }
