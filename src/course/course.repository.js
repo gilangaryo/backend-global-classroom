@@ -58,7 +58,7 @@ export const updateStatus = async (id, status) => {
 export const findAllWithPagination = async ({ skip, take, search, page }) => {
     const whereClause = {
         AND: [
-            { isActive: true },
+            // { isActive: true },
             search
                 ? {
                     title: {
